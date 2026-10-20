@@ -9,23 +9,23 @@
 //
 // UI: three momentary buttons wired between the GPIO and GND. Internal
 // pull-ups are enabled in _setup_gpio(), so no external resistors are needed.
-//   UP   (UP_BTN)  -> previous item / up
-//   SEL  (SEL_BTN) -> select (OK); long press -> back / ESC
-//   DOWN (DW_BTN)  -> next item / down
+//   LEFT   (UP_BTN)  -> previous item / up      GPIO21
+//   SELECT (SEL_BTN) -> select (OK); long press -> back / ESC   GPIO48
+//   RIGHT  (DW_BTN)  -> next item / down        GPIO47
 //
 // Pin numbers can be overridden from the .ini with -DUP_BTN=.. etc.
 // ---------------------------------------------------------------------------
 
 #ifndef UP_BTN
-#define UP_BTN 5
+#define UP_BTN 21
 #endif
 
 #ifndef SEL_BTN
-#define SEL_BTN 4
+#define SEL_BTN 48
 #endif
 
 #ifndef DW_BTN
-#define DW_BTN 6
+#define DW_BTN 47
 #endif
 
 // Buttons short the GPIO to GND, so LOW means pressed.
@@ -59,7 +59,8 @@ void _setup_gpio() {
     pinMode(SEL_BTN, INPUT_PULLUP);
     pinMode(DW_BTN, INPUT_PULLUP);
 
-    bruceConfig.startupApp = "WebUI";
+    // Boot straight into the main menu so the display result is obvious.
+    bruceConfig.startupApp = "Main";
 }
 
 int getBattery() { return 0; }

@@ -5,71 +5,70 @@
 
 ## Итоговая карта GPIO
 
-| GPIO | Занят | Комментарий |
-|---|---|---|
-| 0 | BOOT | strapping, не трогать |
-| 1 | *(свободно)* | W5500 INT / SD CS |
-| 2 | *(свободно)* | W5500 SS |
-| 3 | strapping | JTAG select |
-| **4** | **кнопка SEL** | |
-| **5** | **кнопка UP** | |
-| **6** | **кнопка DOWN** | |
-| 7 | NRF24 CE | по умолчанию выключен |
-| **8** | **TFT CS** | |
-| **9** | **TFT DC** | |
-| **10** | **SPI SS (общий)** | |
-| 11 | *(свободно)* | |
-| **12** | **CC1101 CSN** | |
-| 13 | I2C SDA | |
-| **14** | **CC1101 GDO0** | |
-| **15** | **TFT RST** | он же `SCL` в `pins_arduino.h` — см. ниже |
-| **17** | **SPI MOSI / TFT MOSI** | |
-| **18** | **SPI SCK / TFT SCK** | |
-| **19** | **SPI MISO** | он же native USB `D-` — конфликт при `ARDUINO_USB_MODE=1` |
-| 20 | native USB `D+` | |
-| **21** | **TFT BL** | он же `BAD_TX`, `SERIAL_TX` (UART1) |
-| 22 | `BAD_RX`, `SERIAL_RX` (UART1) | UART для GPS / RFID125 |
-| 26–32 | flash | **занято, недоступно** |
-| 33–37 | octal PSRAM | **занято (модификация N16R8)** |
-| 38 | IR TX (`GROVE_SDA`) | |
-| 39 | IR RX (`GROVE_SCL`) | |
-| 40 | TXLED | |
-| 41 | I2S DATA | микрофон |
-| 42 | I2S BCLK | микрофон |
-| 43 | UART0 TX | логирование |
-| 44 | UART0 RX | логирование |
-| 45, 46 | strapping | VDD_SPI / ROM select |
-| 47 | **CC1101 GDO2** | |
-| 48 | RGB LED | |
+| GPIO | Подпись на плате | Занят | Комментарий |
+|---|---|---|---|
+| 0 | BOOT | strapping | не трогать |
+| 1 | I2C SCL | I²C | PN532, BAT ADC |
+| 2 | I2C SDA | I²C | PN532, BAT ADC |
+| 3 | Display BLK | **подсветка TFT** | он же strapping (JTAG select) |
+| 4 | IR RX | IR приёмник | он же `GROVE_SCL` |
+| 5 | IR TX | IR передатчик | он же `GROVE_SDA` |
+| **6** | CC1101 GDO2 | **CC1101** | |
+| 7 | *(не выведен)* | — | |
+| **8** | CC1101 MISO | **CC1101 SPI** | |
+| **9** | Display DC | **TFT DC** | |
+| **10** | Display RES | **TFT RST** | |
+| **11** | Display SDA | **TFT MOSI** | |
+| **12** | Display SCL | **TFT SCK** | |
+| 13 | Encoder B | энкодер | в профиле не используется |
+| 14 | Encoder A | энкодер | в профиле не используется |
+| **15** | CC1101 CSN | **CC1101** | |
+| **16** | CC1101 GDO0 | **CC1101** | |
+| **17** | CC1101 MOSI | **CC1101 SPI** | |
+| **18** | CC1101 SCK | **CC1101 SPI** | |
+| 19 | SD MISO | SD-SPI | он же native USB `D-` |
+| 20 | SD SCK | SD-SPI | он же native USB `D+` |
+| **21** | LEFT | **кнопка UP** | |
+| 22 | *(не выведен)* | — | |
+| 26–32 | — | SPI flash | **занято, недоступно** |
+| 33–37 | — | octal PSRAM | **занято (N16R8)** |
+| 38 | *(не выведен)* | — | был бы IR TX |
+| 39 | ESP RX (GPS) | UART2 RX | |
+| 40 | ESP TX (GPS) | UART2 TX | он же `SERIAL_TX` в профиле |
+| 41 | SD MOSI | SD-SPI | |
+| 42 | SD CS | SD-SPI | он же `SS` в `pins_arduino.h` |
+| 43 | TXD0 | UART0 TX | логи в CH343 |
+| 44 | RXD0 | UART0 RX | логи в CH343 |
+| 45 | — | strapping | VDD_SPI, не трогать |
+| **46** | Display CS | **TFT CS** | он же strapping (ROM select) |
+| **47** | RIGHT | **кнопка DOWN** | |
+| **48** | SELECT | **кнопка SEL** | |
+
+> `RGB_LED = -1`: отдельного адресуемого светодиода на плате нет, нога 48 — кнопка.
 
 ---
 
 ## Sub-GHz: CC1101 (433 / 868 / 915 МГц)
 
-**Уже включён в этом порту** — пины зашиты в `pins_arduino.h`. Нужно только
-выбрать модуль на устройстве:
+**Уже включён в этом порту** — своя отдельная SPI-шина (не дисплейная).
 
-```
-Меню Bruce → Sub-Ghz → RF Module → CC1101
-```
-
-| CC1101 | GPIO |
-|---|---|
-| MOSI | GPIO17 (общая SPI) |
-| MISO | GPIO19 (общая SPI) |
-| SCK | GPIO18 (общая SPI) |
-| CSN/SS | **GPIO12** |
-| GDO0 | **GPIO14** |
-| GDO2 | **GPIO47** (опция) |
-| VCC | 3.3 V + 10 мкФ и 100 нФ рядом с модулем |
-| GND | GND |
+| CC1101 | Подпись на плате | GPIO |
+|---|---|---|
+| MISO | CC1101 MISO | **GPIO8** |
+| MOSI | CC1101 MOSI | **GPIO17** |
+| SCK | CC1101 SCK | **GPIO18** |
+| CSN | CC1101 CSN | **GPIO15** |
+| GDO0 | CC1101 GDO0 | **GPIO16** |
+| GDO2 | CC1101 GDO2 | **GPIO6** |
+| VCC | — | 3.3 V + 10 мкФ и 100 нФ рядом с модулем |
+| GND | — | GND |
 
 Переопределить пины можно из `.ini` (значения под `#ifndef`):
 
 ```ini
-    -DCC1101_SS_PIN=12
-    -DCC1101_GDO0_PIN=14
-    -DCC1101_GDO2_PIN=47
+    -DCC1101_SS_PIN=15
+    -DCC1101_GDO0_PIN=16
+    -DCC1101_GDO2_PIN=6
 ```
 
 или прямо на устройстве — `Settings → CC1101 Pins` (сохранится в NVS).
@@ -81,84 +80,95 @@
 
 ## 2.4 ГГц: NRF24L01+
 
+В профиле **выключен** (`NRF24_CE_PIN = NRF24_SS_PIN = -1`). Причина: у таких плат
+ноги nRF24 разведены на **GPIO35–38**, а GPIO33–37 в модификации N16**R8** заняты
+octal PSRAM — работа по этой шине рвёт доступ к памяти.
+
+Если модуль всё же нужен, назначьте CE/CSN на реально свободные ноги (например,
+энкодерные GPIO13/14) и переиспользуйте шину CC1101:
+
 ```ini
     -DUSE_NRF24_VIA_SPI
-    -DNRF24_CE_PIN=7
-    -DNRF24_SS_PIN=11
-    -DNRF24_MOSI_PIN=SPI_MOSI_PIN
-    -DNRF24_SCK_PIN=SPI_SCK_PIN
-    -DNRF24_MISO_PIN=SPI_MISO_PIN
+    -DNRF24_CE_PIN=13
+    -DNRF24_SS_PIN=14
+    -DNRF24_MOSI_PIN=17
+    -DNRF24_SCK_PIN=18
+    -DNRF24_MISO_PIN=8
 ```
 
 | NRF24L01+ | GPIO |
 |---|---|
 | MOSI | GPIO17 |
-| MISO | GPIO19 |
+| MISO | GPIO8 |
 | SCK | GPIO18 |
-| CE | GPIO7 |
-| CSN | GPIO11 |
+| CE | GPIO13 (пример) |
+| CSN | GPIO14 (пример) |
 | VCC | 3.3 V + конденсатор 10–100 мкФ |
 
 > NRF24 очень чувствителен к просадкам питания — питайте через отдельный
 > стабилизатор или хотя бы с конденсатором прямо у модуля.
 
-**CC1101 и NRF24 могут висеть на одной SPI одновременно** — CS разные.
-Но в меню Bruce активен только один радио-модуль за раз.
+**CC1101 и NRF24 на одной SPI висеть одновременно не должны** — CS разные, но
+GDO/IRQ ноги начнут конфликтовать. В меню Bruce активен только один радио-модуль.
 
 ---
 
 ## Ethernet: W5500
 
+Свободных ног под CS/INT практически нет (GPIO1/2 заняты I²C). Если модуль нужен —
+освободите I²C или откажитесь от кнопок DOWN/UP:
+
 ```ini
     -DUSE_W5500_VIA_SPI
-    -DW5500_SS_PIN=2
-    -DW5500_MOSI_PIN=SPI_MOSI_PIN
-    -DW5500_SCK_PIN=SPI_SCK_PIN
-    -DW5500_MISO_PIN=SPI_MISO_PIN
-    -DW5500_INT_PIN=1
+    -DW5500_SS_PIN=13
+    -DW5500_INT_PIN=14
+    -DW5500_MOSI_PIN=17
+    -DW5500_SCK_PIN=18
+    -DW5500_MISO_PIN=8
 ```
 
 ---
 
 ## IR приёмник / передатчик
 
-В этом профиле `GROVE_SDA`/`GROVE_SCL` равны `-1`. Чтобы задействовать:
+На плате разведено: **IR TX = GPIO5**, **IR RX = GPIO4**. В профиле они назначены
+как `GROVE_SDA`/`GROVE_SCL`, но сами списки `IR_TX_PINS`/`IR_RX_PINS` включать нужно
+флагами:
 
 ```ini
-    -DGROVE_SDA=38          ; IR TX / RF TX
-    -DGROVE_SCL=39          ; IR RX / RF RX
+    -DGROVE_SDA=5           ; IR TX / RF TX
+    -DGROVE_SCL=4           ; IR RX / RF RX
     -DIR_TX_PINS='{{"IR TX", GROVE_SDA}}'
     -DIR_RX_PINS='{{"IR RX", GROVE_SCL}}'
     -DRF_TX_PINS='{{"RF TX", GROVE_SDA}}'
     -DRF_RX_PINS='{{"RF RX", GROVE_SCL}}'
-    -DTXLED=40
-    -DLED_ON=HIGH
-    -DLED_OFF=LOW
 ```
 
 Передатчик — обычный IR-светодиод через 100–330 Ω. Приёмник — TSOP38238 и т. п.
 
 Однопроводные модули «M5 RF433T/433R» подключаются сюда же.
 
+> Отдельного `TXLED` на плате нет (`TXLED = -1`), подсветка экрана для этой роли
+> не подходит — GPIO3 strapping.
+
 ---
 
 ## RFID 125 кГц (RT-125A и клоны)
 
-Работает через UART-порт Bruce (`bruceConfigPins.uart_bus`), в этом профиле
-это **GPIO21 (TX) / GPIO22 (RX)**:
+Работает через UART-порт Bruce (`bruceConfigPins.uart_bus`). В профиле
+`SERIAL_TX/SERIAL_RX` = **GPIO40 / GPIO39** — это тот же разъём, что и GPS
+(подписи `ESP TX` / `ESP RX`):
 
-| RFID125 | GPIO |
-|---|---|
-| RX модуля | GPIO21 |
-| TX модуля | GPIO22 |
-| VCC | 5 V или 3.3 V (по модулю) |
-| GND | GND |
+| RFID125 | Подпись на плате | GPIO |
+|---|---|---|
+| RX модуля | ESP TX (выход ESP32) | GPIO40 |
+| TX модуля | ESP RX (вход ESP32) | GPIO39 |
+| VCC | — | 5 V или 3.3 V (по модулю) |
+| GND | — | GND |
 
 Скорость жёстко 9600 8N1.
 
-> **Внимание:** GPIO21 — он же подсветка дисплея. Если одновременно
-> используются подсветка и UART1, назначьте `SERIAL_TX`/`SERIAL_RX` на
-> свободные GPIO (например, 1 и 2) через `pins_arduino.h`.
+> GPS и RFID125 делят один порт — одновременно работает только что-то одно.
 
 ---
 
@@ -166,49 +176,53 @@
 
 | Модуль | Шина | Пинов |
 |---|---|---|
-| PN532 (I2C) | I2C | SDA=GPIO13, SCL — см. ниже |
-| PN532 (UART) | UART | GPIO21/GPIO22 + IRQ |
-| MFRC522 | SPI | CS на свободный GPIO, шина 17/18/19 |
-| ST25R3916 | SPI | CS на свободный GPIO |
+| PN532 (I2C) | I2C | SDA=GPIO2, SCL=GPIO1 (разведено на плате) |
+| MFRC522 | SPI | CS на свободный GPIO, шина 8/17/18 |
+| ST25R3916 | SPI | CS на свободный GPIO, шина 8/17/18 |
 
 ### I2C-устройства
 
 ```ini
-    -DSYS_I2C_SDA=13
-    -DSYS_I2C_SCL=12
+    -DSYS_I2C_SDA=2
+    -DSYS_I2C_SCL=1
 ```
 
-> **Не используйте GPIO15 для SCL**, хотя `pins_arduino.h` определяет
-> `#define SCL 15`: этот пин — сброс дисплея. Любой I2C-обход
-> (`Settings → I2C Finder`) дёрнет Reset экрана и погасит изображение.
-> Для I2C берите GPIO12 / GPIO14 / GPIO7.
+> **Не используйте GPIO12 для SCL и GPIO15 для SDA** при экспериментах: в этом
+> профиле GPIO12 — тактовая шина дисплея, а GPIO15 — CC1101 CSN. Любой I2C-обход
+> (`Settings → I2C Finder`) дёрнет эти линии и погасит изображение / собьёт
+> радиомодуль. Для I2C берите GPIO1 (SCL) / GPIO2 (SDA) — они под это и разведены.
 
 ---
 
 ## Микрофон I2S (SPM1423 / INMP441)
 
+На плате микрофон **не разведён**. Если хотите повесить внешний, свободных ног
+практически нет — ближе всего энкодерные GPIO13/14:
+
 ```ini
     -DMIC_SPM1423=1
-    -DPIN_CLK=42
-    -DI2S_BCLK_PIN=42
-    -DI2S_DATA_PIN=41
-    -DPIN_DATA=41
+    -DPIN_CLK=13
+    -DI2S_BCLK_PIN=13
+    -DI2S_DATA_PIN=14
+    -DPIN_DATA=14
 ```
 
 ---
 
 ## SD-карта по SPI
 
-По умолчанию выключена (`SDCARD_CS = -1`). Чтобы включить:
+Разведена на плате (подписи `SD MISO / SCK / MOSI / CS`), но в профиле **выключена**
+(`SDCARD_CS = -1`), чтобы не конфликтовать с меню. Чтобы включить:
 
 ```ini
-    -DSDCARD_CS=1
-    -DSDCARD_SCK=18
+    -DSDCARD_CS=42
+    -DSDCARD_SCK=20
     -DSDCARD_MISO=19
-    -DSDCARD_MOSI=17
+    -DSDCARD_MOSI=41
 ```
 
-Занятый GPIO1 при этом отнимается у W5500 INT.
+> GPIO19/GPIO20 — одновременно ножки native USB. При `ARDUINO_USB_MODE=0`
+> (как в этом профиле) они свободны и безопасно отдаются SD-шине.
 
 ---
 
